@@ -1,34 +1,15 @@
 # Decimal SDK 1.0.0 documentation
 
-Документация по используемым методам для работы с Decimal SDK (dsc-js-sdk версии 1.1.43")
+Документация по используемым методам для работы с Decimal SDK (dsc-js-sdk v1.1.43")
 
 ## Table of Contents
 
 * [Method](#method)
   * [decimal.connect](#decimal-connect)
-  * [PUB lobby.join](#pub-lobbyjoin-operation)
-  * [PUB lobby.leave](#pub-lobbyleave-operation)
-  * [PUB lobby.message.send](#pub-lobbymessagesend-operation)
-  * [PUB lobby.get.all](#pub-lobbygetall-operation)
-  * [PUB lobby.get.user](#pub-lobbygetuser-operation)
-  * [PUB lobby.game.dice](#pub-lobbygamedice-operation)
-  * [PUB lobby.game.buy](#pub-lobbygamebuy-operation)
-  * [PUB lobby.game.skip](#pub-lobbygameskip-operation)
-  * [PUB lobby.game.pay](#pub-lobbygamepay-operation)
-  * [SUB lobby.message.get](#sub-lobbymessageget-operation)
-  * [SUB lobby.get.user.result](#sub-lobbygetuserresult-operation)
-  * [SUB lobby.refresh](#sub-lobbyrefresh-operation)
-  * [SUB lobby.error](#sub-lobbyerror-operation)
-  * [SUB lobby.message](#sub-lobbymessage-operation)
-  * [SUB lobby.user.join](#sub-lobbyuserjoin-operation)
-  * [SUB lobby.user.leave](#sub-lobbyuserleave-operation)
-  * [SUB lobby.game.start](#sub-lobbygamestart-operation)
-  * [SUB lobby.game.dice.result](#sub-lobbygamediceresult-operation)
-  * [SUB lobby.game.player.next](#sub-lobbygameplayernext-operation)
-  * [SUB lobby.game.player.move](#sub-lobbygameplayermove-operation)
-  * [SUB lobby.game.tile.message](#sub-lobbygametilemessage-operation)
-  * [SUB lobby.game.lose](#sub-lobbygamelose-operation)
-  * [SUB lobby.game.win](#sub-lobbygamewin-operation)
+  * [PUB create.wallet](#create-wallet)
+  * [PUB get.balance.coin](#get-balance-coin)
+  * [PUB get.balance.token](#get-balance-token)
+  * [PUB verification.address](#verification-address)
 
 
 ## Method
@@ -68,14 +49,23 @@ const decimalWallet = new Wallet(mnemonic); - Если кошелька для m
 ```
 decimal.setWallet(decimalWallet); - тут decimalWallet - экземпляр полученного кошелька
 ```
+### Options
+| Name | Type | Description |
+|---|---|---|
+| address | string | Адрес текущего кошелька для работы с коинами. Например, d01lhl73321tst2x4v5ygmvk2v0l4jez4mwl2yqt6 |
+| evmAddress | string | Адрес текущего кошелька для работы с токенами. Например, 0xfdffe8e3225c16341dx42236cb298ffd6591576e| 
+| gateUrl | string | Шлюз к которому идёт обращение. Например, 'https://testnet-gate.decimalchain.com/api/  |
 
 ### `Получение баланса коинов`
 
 *Получение баланса коинов кошелька.*
 
-<h1 id="get.coinBalance"></h1>
+<h1 id="get.balance.coin"></h1>
 
+```
 decimal.getAddress(address) - возвращает баланс для всех коинов на кошельке с указанным address
+```
+
 > Examples of payload _(generated)_
 
 ```json
@@ -83,8 +73,8 @@ decimal.getAddress(address) - возвращает баланс для всех 
   "key": "value"
 }
 ```
-key - сокращенное название монеты. Например, Decimal - del
-value - сумма содержащаяся на счету. В общем случае, содержит 18 знаков после запятой + n кол-во знаков после запятой(Зависит от баланса).
+<p>key - сокращенное название монеты. Например, Decimal - del</p>
+<p>value - сумма содержащаяся на счету. В общем случае, содержит 18 знаков после запятой + n кол-во знаков после запятой(Зависит от баланса).</p>
 
 Пример получения баланса коинов кошелька:
 ##### Example
@@ -95,140 +85,80 @@ decimal.setWallet(decimalWallet);
 const decimalBalance = (await decimal.getAddress(address)).balance;
 ```
 
-### PUB `lobby.message.send` Operation
+###  `Получение баланса токенов` Operation
 
-*Отправка payload-а клиентам в лобби*
+*Получение баланса токенов кошелька.*
 
-Временный эвент, отправляет любой переданный payload подключенным к лобби клиентам <h1 id="lobby.message.send"></h1>
+<h1 id="get.balance.token"></h1>
 
-#### Message `anyData`
-
-##### Payload
-
-| Name | Type | Description | Value | Constraints | Notes |
-|---|---|---|---|---|---|
-| (root) | object | Payload может быть любым | - | - | **additional properties are allowed** |
-
-> Examples of payload _(generated)_
-
-```json
-{}
 ```
+decimal.getEvmAccountBalance(address); - возвращает баланс для всех коинов на кошельке с указанным address
+```
+### Options
+| Name | Type | Description |
+|---|---|---|
+| evmAccountERC20TokenBalances | Токен ERC20 | Содержит информацию о ERC20 токенах на аккаунте(По умолчанию через Decimal создаются именно они) |
+| evmAccountERC721TokenBalances | Токен ERC721 | Содержит информацию о ERC721 токенах на аккаунте| 
+| evmAccountERC1155TokenBalances | Токен ERC1155 | Содержит информацию о ERC1155 токенах на аккаунте|
 
-
-
-### PUB `lobby.get.all` Operation
-
-*Получение списка всех лобби, доступна сортировка по полю isFull(заполненное лобби)*
-
-Для получения списка всех лобби необходимо заэмитить этот эвент, сервер отправит ответ на эвент <a href="#lobby.message.get">lobby.message.get</a>
-
-#### Message `getAllData`
-
-##### Payload
-
-| Name | Type | Description | Value | Constraints | Notes |
-|---|---|---|---|---|---|
-| (root) | object | Массив со всеми лобби | - | - | **additional properties are allowed** |
-| lobbies | allOf | - | - | - | **additional properties are allowed** |
-| lobbies.0 (allOf item) | object | - | - | - | **additional properties are NOT allowed** |
-| lobbies.0.id | number | Идентификатор лобби | - | - | - |
-| lobbies.0.name | string | Название лобби | - | - | - |
-| lobbies.0.fieldType | string | Тип поля, временно доступно только стандартное поле (standard) | allowed (`"standard"`, `"big"`, `"huge"`) | - | - |
-| lobbies.0.gameType | string | - | allowed (`"1vs1vs1vs1vs1"`, `"1vs2"`, `"2vs2"`, `"2vs2vs2"`, `"2vs2vs2vs2"`) | - | - |
-| lobbies.0.bet | number | Ставка в золоте (кг) | - | - | - |
-| lobbies.0.password | string | Пароль для лобби | - | - | - |
-| lobbies.0.deals | boolean | "Без сделок" | - | - | - |
-| lobbies.0.vip | boolean | "Без VIP-карт" | - | - | - |
-| lobbies.0.started | boolean | Флаг который отвечает за то запущена ли игра в лобби или нет | - | - | - |
-| lobbies.0.creator | object | Создатель лобби | - | - | **additional properties are NOT allowed** |
-| lobbies.0.creator.userId | number | Идентификатор игрока | - | - | - |
-| lobbies.0.creator.userSocketId | number | Идентификатор сокета игрока | - | - | - |
-| lobbies.0.viewers | array<any> | Массив со зрителями | - | - | - |
-| lobbies.0.viewers.userId | number | Идентификатор игрока | - | - | - |
-| lobbies.0.viewers.userSocketId | number | Идентификатор сокета игрока | - | - | - |
-| lobbies.0.players | array<any> allOf | Массив с игроками | - | - | - |
-| lobbies.0.players.0 (allOf item) | object | - | - | - | **additional properties are NOT allowed** |
-| lobbies.0.players.0.userId | number | Идентификатор игрока | - | - | - |
-| lobbies.0.players.0.userSocketId | number | Идентификатор сокета игрока | - | - | - |
-| lobbies.0.players.1 (allOf item) | object | - | - | - | **additional properties are NOT allowed** |
-| lobbies.0.players.1.currentCell | number | Клетка на которой сейчас находится игрок | - | - | - |
-| lobbies.0.currentPlayerIndex | number | Индекс (из переданого массива) игрока который ходит в данный момент | - | - | - |
-| lobbies.0.totalTurns | number | Количество ходов за всю игру | - | - | - |
-| lobbies.0.startGameTime | string | Дата когда была начата игра | - | format (`date`) | - |
-| lobbies.1 (allOf item) | object | - | - | - | **additional properties are allowed** |
-| lobbies.1.isFull | number | Флаг который показывает полное лобби или нет | - | - | - |
-
+Пример получения баланса токенов ERC20 кошелька:
+##### Example
+```
+const decimalWallet = new Wallet(mnemonic);
+const decimal = await Decimal.connect(DecimalNetworks.testnet);
+decimal.setWallet(decimalWallet);
+const evmBalance = await decimal.getEvmAccountBalance(decimalWallet.evmAddress);
+const evmTokenBalance = evmBalance.evmTokenAccountBalances.evmAccountERC20TokenBalances;
+```
 > Examples of payload _(generated)_
 
 ```json
 {
-  "lobbies": {
-    "id": 0,
-    "name": "string",
-    "fieldType": "standard",
-    "gameType": "1vs1vs1vs1vs1",
-    "bet": 0,
-    "password": "string",
-    "deals": true,
-    "vip": true,
-    "started": true,
-    "creator": {
-      "userId": 0,
-      "userSocketId": 0
-    },
-    "viewers": [],
-    "players": {
-      "userId": 0,
-      "userSocketId": 0,
-      "currentCell": 0
-    },
-    "currentPlayerIndex": 0,
-    "totalTurns": 0,
-    "startGameTime": "2019-08-24",
-    "isFull": 0
-  }
-}
+      "amount": "10000000000000000000",
+      "evmTokenId": 69,
+      "evmAccountId": 1553,
+      "evmToken":  {
+          "id": 69,
+          "address": "0xa2a6296133c79c08be5cc588b92fcec83f10d767",
+          "symbol": "NothingWTSTestToken",
+          "title": "NOT",
+          "decimals": 18,
+          "totalSupply": "10000000000000000000000000",
+          "evmContractId": 134,
+          "evmTokenTypeName": "ERC20",
+          "createdAt": "2023-11-23T17:12:26.088Z",
+          "updatedAt": "2023-11-23T17:12:27.978Z"
+      }
+    }
+
 ```
+evmAccountERC20TokenBalances
+| Name | Type | Description |
+|---|---|---|
+| amount | string | Кол-во токена на кошельке |
+| evmTokenId | integer | Ид токена в EVM(Ethereum Virtual Machine)| 
+| evmAccountId | integer | Ид аккаунта создавшего токен в EVM|
+| evmToken | object | Объект с информацией об токене |
 
+evmToken
+| Name | Type | Description |
+|---|---|---|
+| id | integer | Ид | 
+| address | string | Адрес контракта токена|
+| symbol | string | Полное название токена |
+| title | string | Краткое название токена| 
+| decimals | integer | Кол-во знаков после запятой|
+| totalSupply | string | Общее кол-во созданных токенов(Максимальный лимит) |
+| evmContractId | integer | Ид контракта| 
+| evmTokenTypeName | string | Тип контракта|
 
+### `Верификация адреса кошелька`
 
-### PUB `lobby.get.user` Operation
+*Верификация адреса кошелька для коинов Decimal*
 
-*Получение лобби текущего юзера*
+<h1 id="verification.address"></h1>
 
-Получение лобби текущего юзера (ответ приходит на <a href="#lobby.get.user.result">lobby.get.user.result</a>)
-
-
-### PUB `lobby.game.dice` Operation
-
-*Бросок игральных костей*
-
-Имитация броска игральных костей, необходимо заэмитить этот эвент во время хода соответствующего игрока <br> Результат броска костей будет передан всем находящимся в лобби на эвент <a href="#lobby.game.dice.result">lobby.game.dice.result</a>
-
-
-### PUB `lobby.game.buy` Operation
-
-*Покупка собственности (Кнопка купить)*
-
-Покупка собственности (если это возможно на текущий ход)
-
-
-### PUB `lobby.game.skip` Operation
-
-*Отказ (Кпопка отказать)*
-
-Отказ от покупки собственности
-
-
-### PUB `lobby.game.pay` Operation
-
-*Оплата (Кнопка оплатить)*
-
-Оплата штрафа/таможни/налога
-
-
-
-
-
-
+##### Example
+```
+decimal.verifyAddress(address)
+```
