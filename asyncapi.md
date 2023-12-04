@@ -47,41 +47,50 @@
 | testnet | Тестовая среда | Тестовый шлюз, для финальный проверки работы со всеми транзакциями перед запуском приложения в прод и переведения на mainnet| 
 | devnet | Среда разработки | Шлюз для разработки. В целом вся разработка должна вестись в нем, но на момент написания данного руководства devnet не поддерживал выполнения любых транзакций, по этому разработка велась в testnet  |
 
+##### Example
+Подключение к Decimal делается же следующим образом:
+const decimal = await Decimal.connect(DecimalNetworks.mainnet);
+
+### `create Wallet` Operation
+
+*Как в Decimal создать кошелёк*
+
+<h1 id="create.wallet"></h1>
+
+##### Example
+const bip39 = require("bip39");
+const mnemonic = bip39.generateMnemonic(); - генерирование мнемоника(Тоже само, что и seed-фраза)
+const decimalWallet = new Wallet(mnemonic); - Если кошелька для mnemonic ещё не создано, то создаст новый кошелек. Если же кошелёк уже существует, то будет получен этот кошелёк
+
+При необходимости можно установить текущий кошелёк для выполнения операций через : 
+decimal.setWallet(decimalWallet); - тут decimalWallet - экземпляр полученного кошелька
 
 
-### PUB `lobby.join` Operation
+### `get Coin Balance` Operation
 
-*Подключение к лобби.*
+*Получение баланса коинов кошелька.*
 
-<h1 id="lobby.join"></h1>
+<h1 id="get.coinBalance"></h1>
 
-#### Message `joinLobbyData`
-
-*Тело эвента для подключения к лобби*
-
-##### Payload
-
-| Name | Type | Description | Value | Constraints | Notes |
-|---|---|---|---|---|---|
-| (root) | object | - | - | - | **additional properties are NOT allowed** |
-| lobbyId | number | Айди лобби к которому необходимо подключиться | - | - | **required** |
-
+decimal.getAddress(address) - возвращает баланс для всех коинов на кошельке с указанным address
 > Examples of payload _(generated)_
 
 ```json
 {
-  "lobbyId": 0
+  "key": "value"
 }
 ```
+key - сокращенное название монеты. Например, Decimal - del
+value - сумма содержащаяся на счету. В общем случае, содержит 18 знаков после запятой + n кол-во знаков после запятой(Зависит от баланса).
 
-
-
-### PUB `lobby.leave` Operation
-
-*Выход из лобби.*
-
-Тело эвента отсутсвует, необходимо просто вызвать эвент и клиент выйдет из лобби <h1 id="lobby.leave"></h1>
-
+Пример получения баланса коинов кошелька:
+##### Example
+```
+const decimalWallet = new Wallet(mnemonic);
+const decimal = await Decimal.connect(DecimalNetworks.testnet);
+decimal.setWallet(decimalWallet);
+const decimalBalance = (await decimal.getAddress(address)).balance;
+```
 
 ### PUB `lobby.message.send` Operation
 
