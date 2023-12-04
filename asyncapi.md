@@ -5,7 +5,7 @@
 ## Table of Contents
 
 * [Method](#method)
-  * [decimal.connect](#dicaml-connect)
+  * [decimal.connect](#decimal-connect)
   * [PUB lobby.join](#pub-lobbyjoin-operation)
   * [PUB lobby.leave](#pub-lobbyleave-operation)
   * [PUB lobby.message.send](#pub-lobbymessagesend-operation)
@@ -33,7 +33,7 @@
 
 ## Method
 
-### `decimal.connect` Operation
+### `decimal.connect`
 
 *Подключение к сети Decimal*
 
@@ -51,22 +51,25 @@
 Подключение к Decimal делается же следующим образом:
 const decimal = await Decimal.connect(DecimalNetworks.mainnet);
 
-### `create Wallet` Operation
+### `Создание кошелька`
 
 *Как в Decimal создать кошелёк*
 
 <h1 id="create.wallet"></h1>
 
 ##### Example
+```
 const bip39 = require("bip39");
 const mnemonic = bip39.generateMnemonic(); - генерирование мнемоника(Тоже само, что и seed-фраза)
 const decimalWallet = new Wallet(mnemonic); - Если кошелька для mnemonic ещё не создано, то создаст новый кошелек. Если же кошелёк уже существует, то будет получен этот кошелёк
+```
 
 При необходимости можно установить текущий кошелёк для выполнения операций через : 
+```
 decimal.setWallet(decimalWallet); - тут decimalWallet - экземпляр полученного кошелька
+```
 
-
-### `get Coin Balance` Operation
+### `Получение баланса коинов`
 
 *Получение баланса коинов кошелька.*
 
